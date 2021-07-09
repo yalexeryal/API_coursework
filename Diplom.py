@@ -114,9 +114,9 @@ class YaAPI:
 
 
 def make_copy():
-    ya_token = token_ya_disk  # input('YandexDisk token:')
-    user_id = id_vk  # input('VK user id:')
-    qty = 5  # input('Number of photos to upload: ')
+    ya_token = token_ya_disk
+    user_id = id_vk
+    qty = 5
     vk_api = VkAPI()
     ya_api: YaAPI = YaAPI(ya_token)
     ya_api.upload(user_id, vk_api.get_photos(user_id, int(qty)))
