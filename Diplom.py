@@ -120,7 +120,7 @@ def make_copy():
     quantity_photos = input('Enter the number of photos to save on yandex disk: ')
     vk_api = VkAPI()
     ya_api: YaAPI = YaAPI(ya_token)
-    ya_api.upload(user_id, vk_api.get_photos(user_id))
+    ya_api.upload(user_id, vk_api.get_photos(user_id, int(quantity_photos)))
 
 
 if __name__ == '__main__':
