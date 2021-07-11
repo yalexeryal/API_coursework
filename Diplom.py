@@ -4,8 +4,8 @@ import datetime
 import time
 from datetime import datetime
 from urllib.parse import urljoin
-from TOKEN import token_vk, token_ya_disk, id_vk
 from tqdm import tqdm
+
 
 class Photo:
     name = ''
@@ -24,35 +24,36 @@ class Photo:
 
 class VkAPI:
     URL = "https://api.vk.com/method/"
-    token = token_vk
+    token = 'token'  # Write down your VK token
 
     @staticmethod
     def find_largest(sizes):
-        sizes_chart = ['x', 'z', 'y', 'r', 'q', 'p', 'o', 'x', 'm', 's']
-        for chart in sizes_chart:
+        sizes_list = ['x', 'z', 'y', 'r', 'q', 'p', 'o', 'x', 'm', 's']
+        for symbol in sizes_list:
             for size in sizes:
-                if size['type'] == chart:
+                if size['type'] == symbol:
                     return size
 
     def __init__(self):
         self.token = self.token
         self.version = '5.131'
 
-    def get_photos(self, user_id, qty=5):
-        get_url = urljoin(self.URL, 'photos.getAll')
-        resp = requests.get(get_url, params={
+    def get_photos(self, user_id, quantity_photos=5):
+        url = urljoin(self.URL, 'photos.getAll')
+        result = requests.get(url, params={
             'access_token': self.token,
             'v': self.version,
             'owner_id': user_id,
             'album_id': 'profile',
-            'photo_sizes': 1,
-            'extended': 1
+            'photo_sizes': 1,  # 1 — возвращать доступные размеры фотографии в специальном формате.
+            'extended': 1  # extended	1 — будут возвращены дополнительные поля
+            # likes, comments, tags, can_comment, reposts. По умолчанию: 0.
         }).json().get('response').get('items')
 
         return sorted([Photo(photo.get('date'),
                              photo.get('likes')['count'],
-                             self.find_largest(photo.get('sizes'))) for photo in resp],
-                      key=lambda p: p.maxsize, reverse=True)[:qty]
+                             self.find_largest(photo.get('sizes'))) for photo in result],
+                      key=lambda p: p.maxsize, reverse=True)[:quantity_photos]
 
 
 class YaAPI:
@@ -66,15 +67,15 @@ class YaAPI:
             photo.name += '.jpg'
 
     @staticmethod
-    def check_folder_name(n_folder, ex_folders):
-        if n_folder not in ex_folders:
-            return n_folder
-        n = 1
-        n_folder += '_' + str(n)
-        while n_folder in ex_folders:
-            n_folder = n_folder.replace('_' + str(n), '_' + str(n + 1))
-            n += 1
-        return n_folder
+    def check_folder_name(name_folder, ex_folders):
+        if name_folder not in ex_folders:
+            return name_folder
+        num = 1
+        name_folder += '_' + str(num)
+        while name_folder in ex_folders:
+            name_folder = name_folder.replace('_' + str(num), '_' + str(num + 1))
+            num += 1
+        return name_folder
 
     def __init__(self, token: str):
         self.auth = f'OAuth {token}'
@@ -114,12 +115,12 @@ class YaAPI:
 
 
 def make_copy():
-    ya_token = token_ya_disk
-    user_id = id_vk
-    qty = 5
+    ya_token = input('Enter the Yandex disk token: ')  # Or write down the Yandex disk token
+    user_id = input('Enter the identification number of the VKONTAKTE user')  # Or write down id VK
+    quantity_photos = input('Enter the number of photos to save on yandex disk: ')
     vk_api = VkAPI()
     ya_api: YaAPI = YaAPI(ya_token)
-    ya_api.upload(user_id, vk_api.get_photos(user_id, int(qty)))
+    ya_api.upload(user_id, vk_api.get_photos(user_id))
 
 
 if __name__ == '__main__':
