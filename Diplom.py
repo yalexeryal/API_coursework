@@ -24,7 +24,7 @@ class Photo:
 
 class VkAPI:
     URL = "https://api.vk.com/method/"
-    token = 'token'  # Write down your VK token
+    token = '958eb5d439726565e9333aa30e50e0f937ee432e927f0dbd541c541887d919a7c56f95c04217915c32008'
 
     @staticmethod
     def find_largest(sizes):
@@ -39,15 +39,14 @@ class VkAPI:
         self.version = '5.131'
 
     def get_photos(self, user_id, quantity_photos=5):
-        url = urljoin(self.URL, 'photos.getAll')
+        url = urljoin(self.URL, 'photos.get')
         result = requests.get(url, params={
             'access_token': self.token,
             'v': self.version,
             'owner_id': user_id,
             'album_id': 'profile',
-            'photo_sizes': 1,  # 1 — возвращать доступные размеры фотографии в специальном формате.
-            'extended': 1  # extended	1 — будут возвращены дополнительные поля
-            # likes, comments, tags, can_comment, reposts. По умолчанию: 0.
+            'photo_sizes': 1,
+            'extended': 1
         }).json().get('response').get('items')
 
         return sorted([Photo(photo.get('date'),
@@ -116,7 +115,7 @@ class YaAPI:
 
 def make_copy():
     ya_token = input('Enter the Yandex disk token: ')  # Or write down the Yandex disk token
-    user_id = input('Enter the identification number of the VKONTAKTE user')  # Or write down id VK
+    user_id = input('Enter the identification number of the VKONTAKTE user: ')  # Or write down id VK
     quantity_photos = input('Enter the number of photos to save on yandex disk: ')
     vk_api = VkAPI()
     ya_api: YaAPI = YaAPI(ya_token)
